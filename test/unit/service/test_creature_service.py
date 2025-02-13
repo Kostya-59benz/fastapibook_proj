@@ -1,8 +1,9 @@
 import sys
-
-sys.path.append("D:\\Kostya\\fast_api_tasks\\creatures")
+import pytest
+sys.path.append("C:\\projects_2025\\pythonbook\\fastapibook_proj")
 from model.creature import Creature
 from service import creature as code
+from error import Missing
 
 sample = Creature(
     name="Yeti",
@@ -25,5 +26,6 @@ def test_get_exists():
 
 
 def test_get_missing():
-    resp = code.get_one("boxturtle")
-    assert resp is None
+    with pytest.raises(Missing):
+        _ = code.get_one("boxturtle")
+    
