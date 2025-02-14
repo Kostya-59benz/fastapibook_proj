@@ -1,11 +1,10 @@
 from model.user import User
-from init import conn, curs, IntegrityError
+from .init import curs, IntegrityError
 from error import Duplicate, Missing
 
 
 
-
-curs.execute(""" create table if not exists user(
+curs.execute("""create table if not exists user(
              name text primary key,
              hash text)""")
 
@@ -16,13 +15,13 @@ name text primary key,
 hash text)""")
 
 
-def row_to_model(row: dict) -> User:
+def row_to_model(row: tuple) -> User:
     name, hash = row
     return User(name=name, hash=hash)
 
 
 def model_to_dict(user: User) -> dict:
-    user.model_dump()
+    return user.model_dump() if user else {}
 
 
 
@@ -33,32 +32,37 @@ def get_one(name: str) -> User:
     curs.execute(qry,params)
     row = curs.fetchone()
     if row:
-        row_to_model(row)
+        return row_to_model(row)
     else:
         raise Missing(msg=f"User {name} not found")
     
 
 def get_all() -> list[User]:
     qry = "select * from users"
-    rows = curs.execute(qry)
+    curs.execute(qry)
     return [row_to_model(row) for row in curs.fetchall()]
 
 
 def create(user: User, table:str = "user"):
-    qry = f"insert into {table} (name, hash) values (:name, :hash) "
+    if table not in ("user", "xuser"):
+        raise Exception(f"Invalid table name {table}")
+    qry =  f"""insert into {table}
+        (name, hash)
+        values
+        (:name, :hash)"""
     params = model_to_dict(user)
-
-
+    
     try:
-        curs.execute(qry, params)
+        curs.execute(qry,params)
+        
     except IntegrityError:
         raise Duplicate(msg=
         f"{table}: user {user.name} already exists")   
-
+    return get_one(user.name)
 
 def modify(name:str, user: User) -> User:
     
-    qry = " update user set name=:name, hash=:hash where name=:name0"
+    qry = "update user set name=:name, hash=:hash where name=:name0"
 
 
     params = {"name": user.name,

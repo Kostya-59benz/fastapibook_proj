@@ -1,17 +1,16 @@
-from datetime import timedelta, datetime
+from datetime import timedelta, datetime, timezone
 
-import os
 from jose import jwt
 from model.user import User
 
 
-if os.getenv("CRYPTID_UNIT_TEST"):
-    from fake import user as data
 
-else:
-    from data import user as data
+from data import user as data
 
-# --- New auth data
+
+TOKEN_EXPIRES_MINUTES = 15 # minutes
+
+# --- New auth stuff
 from passlib.context import CryptContext
 
 # Change SECRET_KEY for operating env!
@@ -51,9 +50,9 @@ def get_current_user(token: str) -> User | None:
     return None
 
 
-def lookup_user(username: str) -> User | None:
-    """Returning qual user from database for name string"""
-    if user := data.get(username):
+def lookup_user(name: str) -> User | None:
+    """Returning a matching user from database for name string"""
+    if (user := data.get_one(name)):
         return user
     return None
 
@@ -61,7 +60,7 @@ def lookup_user(username: str) -> User | None:
 def auth_user(name: str, plain: str) -> User | None:
     """User authentication <name> and <plain> password"""
     if not (user := lookup_user(name)):
-        return user
+        return None
 
     if not verify_password(plain, user.hash):
         return None
@@ -69,12 +68,12 @@ def auth_user(name: str, plain: str) -> User | None:
 
 
 def create_access_token(data: dict, expires: timedelta | None = None):
-    """Return access token JWT"""
-
+    
+    """Return JWT token access"""
     src = data.copy()
-    now = datetime.now(datetime.timezone.utc)
-    if not expires:
-        expires = timedelta(minutes=15)
+    now = datetime.now(timezone.utc)
+
+    expires = expires or datetime.timedelta(minutes=TOKEN_EXPIRES_MINUTES)
     src.update({"exp": now + expires})
     encoded_jwt = jwt.encode(src, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
@@ -92,6 +91,7 @@ def get_one(name) -> User:
 
 
 def create(user: User) -> User:
+    user.hash = hash(user.hash)
     return data.create(user)
 
 

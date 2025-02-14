@@ -53,7 +53,7 @@ def create(creature: Creature) -> Creature:
         return get_one(creature.name)
     except IntegrityError:
         raise Duplicate(msg=f"{creature.name} already exists!")
-
+    
 
 def modify(name, creature: Creature) -> Creature:
     qry = """update creature set country=:country,

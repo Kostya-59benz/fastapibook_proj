@@ -3,10 +3,8 @@ from fastapi import APIRouter, HTTPException, Depends
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from model.user import User
 from datetime import timedelta
-if os.getenv("CRYPTID_UNIT_TEST"):
-    from fake import user as service
-else:
-    from service import user as service
+
+from service import user as service
 
 from error import Missing, Duplicate
 
@@ -37,19 +35,19 @@ def unauthed():
 async def create_access_token(
     form_data: OAuth2PasswordRequestForm = Depends()
 ):
-    """Receive username and password from OAuth Form, return access token"""
+    """Get username and password from OAuth Form, return access token"""
     user = service.auth_user(form_data.username, form_data.password)
     if not user:
         unauthed()
 
     expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = service.create_access_token(
-        data = {"sub": user.username}, expires=expires
+        data = {"sub": user.name}, expires=expires
     )
 
     return {"access_token": access_token, "token_type": "bearer"}
 
-@app.get("/token")
+@router.get("/token")
 def get_access_token(token: str = Depends(oauth2_dep)) -> dict:
     """Return current access token"""
     return {'token': token}
