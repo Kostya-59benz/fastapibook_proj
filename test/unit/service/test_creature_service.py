@@ -1,10 +1,7 @@
-<<<<<<< HEAD
-import pytest
-=======
+
 import sys
 import pytest
-sys.path.append("C:\\projects_2025\\pythonbook\\fastapibook_proj")
->>>>>>> 68c004e6c131ce30d235b0457cb1811cd15113c0
+
 from model.creature import Creature
 from service import creature as code
 from error import Missing

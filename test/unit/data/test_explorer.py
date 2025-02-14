@@ -1,16 +1,11 @@
 import os
-<<<<<<< HEAD
-=======
 import sys
->>>>>>> 68c004e6c131ce30d235b0457cb1811cd15113c0
+
 import pytest
 from error import Missing, Duplicate
 
 
-<<<<<<< HEAD
-=======
-sys.path.append("C:\\projects_2025\\pythonbook\\fastapibook_proj")
->>>>>>> 68c004e6c131ce30d235b0457cb1811cd15113c0
+
 from model.explorer import Explorer
 
 os.environ["CRYPTID_SQLITE_DB"] = ":memory:"
