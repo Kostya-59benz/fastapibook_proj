@@ -2,7 +2,7 @@ import os
 import sys
 import pytest
 
-sys.path.append("D:\\Kostya\\fast_api_tasks\\creatures")
+sys.path.append("C:\\projects_2025\\pythonbook\\fastapibook_proj")
 
 from model.creature import Creature
 from error import Missing, Duplicate
@@ -10,6 +10,7 @@ from error import Missing, Duplicate
 # set this before data imports below for data.init
 os.environ["CRYPTID_SQLITE_DB"] = ":memory:"
 from data import creature
+
 
 
 
